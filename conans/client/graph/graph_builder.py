@@ -27,7 +27,7 @@ class DepsGraphBuilder(object):
         self._check_update = check_update
         self._resolve_prereleases = self._cache.new_config.get('core.version_ranges:resolve_prereleases')
 
-    def load_graph(self, root_node, profile_host, profile_build, graph_lock=None):
+    def load_graph(self, root_node, profile_host, profile_build, graph_lock=None, callback=None):
         assert profile_host is not None
         assert profile_build is not None
         assert isinstance(profile_host.options, Options)
@@ -50,6 +50,10 @@ class DepsGraphBuilder(object):
                 (require, node) = open_requires.popleft()
                 if require.override:
                     continue
+
+                if callback:
+                    callback(require)
+
                 new_node = self._expand_require(require, node, dep_graph, profile_host,
                                                 profile_build, graph_lock)
                 if new_node:

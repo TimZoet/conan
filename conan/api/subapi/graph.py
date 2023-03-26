@@ -130,7 +130,7 @@ class GraphAPI:
 
     def load_graph_consumer(self, path, name, version, user, channel,
                             profile_host, profile_build, lockfile, remotes, update,
-                            check_updates=False, is_build_require=False):
+                            check_updates=False, is_build_require=False, callback=None):
         root_node = self._load_root_consumer_conanfile(path, profile_host, profile_build,
                                                        name=name, version=version, user=user,
                                                        channel=channel, lockfile=lockfile,
@@ -139,11 +139,11 @@ class GraphAPI:
 
         deps_graph = self.load_graph(root_node, profile_host=profile_host,
                                      profile_build=profile_build, lockfile=lockfile,
-                                     remotes=remotes, update=update, check_update=check_updates)
+                                     remotes=remotes, update=update, check_update=check_updates, callback=callback)
         return deps_graph
 
     def load_graph(self, root_node, profile_host, profile_build, lockfile=None, remotes=None,
-                   update=False, check_update=False):
+                   update=False, check_update=False, callback=None):
         """ Compute the dependency graph, starting from a root package, evaluation the graph with
         the provided configuration in profile_build, and profile_host. The resulting graph is a
         graph of recipes, but packages are not computed yet (package_ids) will be empty in the
@@ -169,7 +169,7 @@ class GraphAPI:
         remotes = remotes or []
         builder = DepsGraphBuilder(app.proxy, app.loader, app.range_resolver, app.cache, remotes,
                                    update, check_update)
-        deps_graph = builder.load_graph(root_node, profile_host, profile_build, lockfile)
+        deps_graph = builder.load_graph(root_node, profile_host, profile_build, lockfile, callback)
         return deps_graph
 
     def analyze_binaries(self, graph, build_mode=None, remotes=None, update=None, lockfile=None):
